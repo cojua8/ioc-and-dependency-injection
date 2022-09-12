@@ -1,7 +1,8 @@
 from datetime import date
 from typing import Protocol
 from dateutil.relativedelta import relativedelta
-from services.mindicador import MindicadorService
+
+from services.indicator_service_protocol import IndicatorServiceProtocol
 
 
 class ReadjustProtocol(Protocol):
@@ -24,6 +25,9 @@ class Readjuster:
 
 
 class IPCReadjust(ReadjustProtocol):
+    def __init__(self, indicator_service: IndicatorServiceProtocol) -> None:
+        self._indicator_service = indicator_service
+
     def readjust_percentage(self, months) -> float:
         ipc_values = self.__get_ipc(months)
 
@@ -33,14 +37,13 @@ class IPCReadjust(ReadjustProtocol):
         date_to = date.today()
         date_from = date_to - relativedelta(months=months)
 
-        ipc_values = MindicadorService().get_ipc_values()
-
-        return [
-            v.valor for v in ipc_values.serie if date_from <= v.fecha.date() <= date_to
-        ]
+        return self._indicator_service.get_ipc_values(date_from, date_to)
 
 
 class UFReadjust(ReadjustProtocol):
+    def __init__(self, indicator_service: IndicatorServiceProtocol) -> None:
+        self._indicator_service = indicator_service
+
     def readjust_percentage(self, months) -> float:
         uf_values = self.__get_uf(months)
 
@@ -50,8 +53,4 @@ class UFReadjust(ReadjustProtocol):
         date_to = date.today()
         date_from = date_to - relativedelta(months=months)
 
-        uf_values = MindicadorService().get_uf_values()
-
-        return [
-            v.valor for v in uf_values.serie if v.fecha.date() in [date_to, date_from]
-        ]
+        return self._indicator_service.get_uf_values(date_from, date_to)

@@ -1,8 +1,7 @@
 from datetime import date
 from typing import Protocol
 from dateutil.relativedelta import relativedelta
-
-from services.indicator_service_protocol import IndicatorServiceProtocol
+from example.indicator_services import MindicadorService
 
 
 class ReadjustProtocol(Protocol):
@@ -10,23 +9,9 @@ class ReadjustProtocol(Protocol):
         ...
 
 
-class Readjuster:
-    def __init__(self, amount, months, readjust_calculator: ReadjustProtocol) -> None:
-        self._amount = amount
-        self._months = months
-        self._readjust_calculator = readjust_calculator
-
-    def calculate(self) -> float:
-        readjust_percentage = self._readjust_calculator.readjust_percentage(
-            self._months
-        )
-
-        return round(self._amount * (readjust_percentage + 1), 2)
-
-
 class IPCReadjust(ReadjustProtocol):
-    def __init__(self, indicator_service: IndicatorServiceProtocol) -> None:
-        self._indicator_service = indicator_service
+    def __init__(self) -> None:
+        self._indicator_service = MindicadorService()
 
     def readjust_percentage(self, months) -> float:
         ipc_values = self.__get_ipc(months)
@@ -41,8 +26,8 @@ class IPCReadjust(ReadjustProtocol):
 
 
 class UFReadjust(ReadjustProtocol):
-    def __init__(self, indicator_service: IndicatorServiceProtocol) -> None:
-        self._indicator_service = indicator_service
+    def __init__(self) -> None:
+        self._indicator_service = MindicadorService()
 
     def readjust_percentage(self, months) -> float:
         uf_values = self.__get_uf(months)

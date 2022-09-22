@@ -1,11 +1,17 @@
-from example.readjust_calculators import IPCReadjust
+from dependency_injector.wiring import Provide, inject
 
 
 class Readjuster:
-    def __init__(self, amount, months) -> None:
+    @inject
+    def __init__(
+        self,
+        amount,
+        months,
+        readjust_calculator=Provide["readjuster_service"],
+    ) -> None:
         self._amount = amount
         self._months = months
-        self._readjust_calculator = IPCReadjust()
+        self._readjust_calculator = readjust_calculator
 
     def calculate(self) -> float:
         readjust_percentage = self._readjust_calculator.readjust_percentage(

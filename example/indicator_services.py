@@ -1,8 +1,9 @@
 from datetime import date
-import os
 from typing import List, Protocol
-
+from dependency_injector.wiring import Provide, inject
 import requests
+
+# from example.container import Container #esto haria un import circular
 
 from example.indicator_models import CentralBankResponse, MindicadorResponse
 
@@ -43,10 +44,15 @@ class MindicadorService(IndicatorServiceProtocol):
 
 
 class BancoCentralService(IndicatorServiceProtocol):
-    def __init__(self) -> None:
+    @inject
+    def __init__(
+        self,
+        user: str = Provide["config.bcentral_user"],
+        password: str = Provide["config.bcentral_pass"],
+    ) -> None:
         self._base_url = "https://si3.bcentral.cl/SieteRestWS/SieteRestWS.ashx"
-        self._user = os.environ["BANCO_CENTRAL_USER"]
-        self._password = os.environ["BANCO_CENTRAL_PASS"]
+        self._user = user
+        self._password = password
 
     def get_ipc_values(self, date_from, date_to):
         ipc_values = self.__get_values("F074.IPC.VAR.Z.Z.C.M")

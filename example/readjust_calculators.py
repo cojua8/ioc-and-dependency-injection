@@ -1,7 +1,10 @@
 from datetime import date
 from typing import Protocol
 from dateutil.relativedelta import relativedelta
-from example.indicator_services import MindicadorService
+
+# from example.container import Container
+from example.indicator_services import IndicatorServiceProtocol
+from dependency_injector.wiring import Provide, inject
 
 
 class ReadjustProtocol(Protocol):
@@ -10,8 +13,12 @@ class ReadjustProtocol(Protocol):
 
 
 class IPCReadjust(ReadjustProtocol):
-    def __init__(self) -> None:
-        self._indicator_service = MindicadorService()
+    @inject
+    def __init__(
+        self,
+        indicator_service: IndicatorServiceProtocol = Provide["indicator_service"],
+    ) -> None:
+        self._indicator_service = indicator_service
 
     def readjust_percentage(self, months) -> float:
         ipc_values = self.__get_ipc(months)
@@ -26,8 +33,12 @@ class IPCReadjust(ReadjustProtocol):
 
 
 class UFReadjust(ReadjustProtocol):
-    def __init__(self) -> None:
-        self._indicator_service = MindicadorService()
+    @inject
+    def __init__(
+        self,
+        indicator_service: IndicatorServiceProtocol = Provide["indicator_service"],
+    ) -> None:
+        self._indicator_service = indicator_service
 
     def readjust_percentage(self, months) -> float:
         uf_values = self.__get_uf(months)

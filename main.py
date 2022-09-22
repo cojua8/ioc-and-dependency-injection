@@ -1,6 +1,11 @@
 from example.readjuster import Readjuster
 
+
 if __name__ == "__main__":
+    from example.container import Container
+
+    container = Container()
+
     total_amount = 1000
     months = 3
 
